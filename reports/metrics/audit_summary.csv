@@ -1,0 +1,5 @@
+,count_total,count_readable,width,width,width,height,height,height,file_size_kb,file_size_kb,file_size_kb
+,,,min,median,max,min,median,max,min,median,max
+class,,,,,,,,,,,
+ai,539,539,225,1024.0,6000,135,800.0,4001,11.46,195.08,5494.32
+real,436,436,183,920.0,8495,158,720.0,7091,11.05,141.445,9956.4

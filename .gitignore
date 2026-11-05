@@ -20,10 +20,9 @@ __pycache__/
 venv/
 env/
 
-# --- Data: tracked by DVC, not Git (Task 1.4) ---
-/data/raw/*
-!/data/raw/.gitkeep
-/data/raw.dvc.lock
+# --- Data: data/raw is tracked by DVC (data/raw.dvc), never by Git (Task 1.4).
+# `dvc add` also writes data/.gitignore; this line is a safety net before that. ---
+/data/raw/
 *.zip
 
 # --- Models: tracked by DVC / MLflow registry, not Git ---

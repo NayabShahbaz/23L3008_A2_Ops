@@ -80,9 +80,16 @@ def main() -> None:
     dups.to_csv(out_dir / "duplicates.csv", index=False)
     cross_class = dups.groupby("sha256")["class"].nunique().gt(1).sum()
 
-    pd.set_option("display.width", 200)
-    print("\n=== Counts and stats per class ===")
-    print(summary)
+    pd.set_option("display.width", 250)
+    pd.set_option("display.max_columns", None)
+    print("\n=== Counts per class ===")
+    print(summary[["count_total", "count_readable"]].droplevel(1, axis=1).to_string())
+    for col, unit in [("width", "px"), ("height", "px"), ("file_size_kb", "KB")]:
+        print(f"\n=== {col} ({unit}): min / median / max ===")
+        print(summary[col].to_string())
+
+    ext = df.path.str.rsplit(".", n=1).str[-1].str.lower().replace({"jpg": "jpeg"})
+    mismatch = df[df.readable & (ext != df.format.str.lower())]
     print("\n=== Formats / colour modes ===")
     print(pd.crosstab(ok["class"], ok["format"]))
     print(pd.crosstab(ok["class"], ok["mode"]))
@@ -90,6 +97,12 @@ def main() -> None:
     print(f"Unreadable / corrupt  : {(~df.readable).sum()}")
     print(f"Exact duplicate files : {int(df.is_duplicate.sum())} (extra copies)")
     print(f"Hashes in BOTH classes: {int(cross_class)}")
+    print(f"Extension != real fmt : {len(mismatch)}")
+    for _, r in mismatch.iterrows():
+        print(f"    {r.path}  (actually {r.format})")
+    for _, r in df[df.is_duplicate].iterrows():
+        twin = df[(df.sha256 == r.sha256) & ~df.is_duplicate].path.iloc[0]
+        print(f"    duplicate: {r.path}  ==  {twin}")
     print(f"\nSaved: {p['data']['audit_csv']}, reports/metrics/audit_summary.csv, reports/metrics/duplicates.csv")
 
 
