@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Result{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Result</h1>
+  <p class="verdict {{ 'ai' if p.label == 'AI-generated' else 'real' }}">{{ p.label }}</p>
+  <div class="meter"><div style="width: {{ (p.confidence * 100)|round(1) }}%"></div></div>
+  <table class="kv">
+    <tr><th>File</th><td>{{ filename }} ({{ size[0] }}×{{ size[1] }})</td></tr>
+    <tr><th>Confidence</th><td>{{ '%.1f'|format(p.confidence * 100) }}%</td></tr>
+    <tr><th>P(AI-generated)</th><td>{{ '%.4f'|format(p.prob_ai) }} (threshold {{ p.threshold }})</td></tr>
+    <tr><th>Model</th><td>{{ p.model_name }} @ {{ p.model_version }}</td></tr>
+    <tr><th>Latency</th><td>{{ p.latency_ms }} ms</td></tr>
+    <tr><th>Record id</th><td>#{{ row_id }}</td></tr>
+  </table>
+  <p class="caveat"><strong>Caveat:</strong> this is a statistical guess from a model trained on one Kaggle dataset.
+    It can be wrong, especially on edited, compressed, painted or very small images, and on generators it never saw.
+    Do not use it as the only evidence that an image is fake.</p>
+  <a class="button" href="{{ url_for('main.index') }}">Analyse another image</a>
+</section>
+{% endblock %}

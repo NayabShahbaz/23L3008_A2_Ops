@@ -1,0 +1,58 @@
+# Task 6.3 - two services on Compose's internal network: web + db.
+#   docker compose up -d --build
+#   docker compose ps          (both should show "healthy")
+# Passwords come from the untracked .env file (see .env.example).
+name: 23l3008_a2_ops
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data       # named volume -> data survives container removal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # NO "ports:" -> the database is reachable only from inside the Compose network
+
+  web:
+    build: .
+    image: 23l3008-a2-ops-web
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false        # real values in untracked .env
+    environment:
+      # "db" is the service name, resolved by Compose's internal DNS
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      MODEL_PATH: /app/models/champion.keras
+      FLASK_DEBUG: "0"
+    volumes:
+      - ./models:/app/models:ro               # model is MOUNTED (read-only), not baked into the image
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy            # wait for Postgres readiness, not just start
+
+  # Optional: run the cloud model API locally for testing (docker compose --profile api up)
+  api:
+    profiles: ["api"]
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    image: 23l3008-a2-ops-api
+    env_file:
+      - path: .env
+        required: false        # real values in untracked .env
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:

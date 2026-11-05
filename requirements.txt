@@ -1,0 +1,17 @@
+# Training / experimentation environment (Task 1.1).
+# After installing, record exact versions:  pip freeze > reports/metrics/pip_freeze.txt
+tensorflow==2.20.*
+keras-tuner==1.4.*
+mlflow==2.22.*          # 2.x: known-good with DagsHub's tracking server + registry aliases
+dagshub>=0.5
+dvc>=3.50
+pandas>=2.2
+matplotlib>=3.9
+scikit-learn>=1.5
+pyyaml>=6
+tqdm>=4
+
+# app + tests (so one venv can run everything locally)
+-r requirements-app.txt
+pytest>=8
+ruff>=0.8

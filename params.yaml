@@ -1,0 +1,53 @@
+# Single source of truth for training settings. Every script reads this file,
+# and train.py logs it to MLflow so runs are reproducible.
+
+project: 23L3008_A2_Ops
+seed: 42
+
+data:
+  raw_dir: data/raw
+  splits_dir: data/splits
+  audit_csv: reports/metrics/audit.csv
+  # Kaggle folder name -> label. Positive class (1) = AI-generated.
+  class_map:
+    AiArtData: ai
+    RealArt: real
+  label_ids:
+    real: 0
+    ai: 1
+  val_frac: 0.15
+  test_frac: 0.15
+
+image:
+  size: 224        # square input; images are resized (aspect ratio NOT preserved) -- see data_pipeline.py
+  channels: 3
+
+train:
+  batch_size: 32
+  epochs: 30
+  learning_rate: 0.001
+  augment: true
+  early_stopping_patience: 5
+  reduce_lr_patience: 2
+  reduce_lr_factor: 0.3
+
+baseline_cnn:
+  filters: [32, 64, 128]
+  dropout: 0.4
+
+transfer:
+  backbone: MobileNetV2          # MobileNetV2 | EfficientNetB0 | ResNet50
+  head_dropout: 0.3
+  stage1_epochs: 10
+  stage1_lr: 0.001
+  stage2_epochs: 10
+  stage2_lr: 0.00001              # much smaller LR for fine-tuning
+  unfreeze_last_n: 20             # "last block" for MobileNetV2 ~ last 20 layers
+
+tuner:
+  max_trials: 8
+  epochs: 5
+
+registry:
+  model_name: visionguard
+  alias: champion

@@ -1,0 +1,8 @@
+# Used automatically (BuildKit) for api/Dockerfile instead of the root .dockerignore.
+# Unlike the web image, the API image MUST include the champion model.
+*
+!requirements-app.txt
+!app/
+!api/
+!models/champion.keras
+**/__pycache__

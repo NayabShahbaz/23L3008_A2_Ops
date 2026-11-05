@@ -1,0 +1,36 @@
+# Task 6.6 (apply) - lint, test and build the VisionGuard image on every push / PR.
+# Secrets (e.g. DOCKERHUB_TOKEN, DAGSHUB_TOKEN) live in GitHub -> Settings ->
+# Secrets and variables -> Actions, and are referenced as ${{ secrets.NAME }}.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-app.txt
+          pip install pytest ruff
+      - name: Lint
+        run: ruff check app api tests
+      - name: Test
+        run: pytest -v
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: lint-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build web image
+        run: docker build -t 23l3008-a2-ops-web:${{ github.sha }} .
+      - name: Image size
+        run: docker image ls 23l3008-a2-ops-web

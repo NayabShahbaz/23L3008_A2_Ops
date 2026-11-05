@@ -1,0 +1,10 @@
+# Serving dependencies only (used by the Docker images). TensorFlow is installed
+# separately in the Dockerfiles as tensorflow-cpu to keep the image smaller.
+flask==3.1.*
+gunicorn>=23
+sqlalchemy==2.0.*
+psycopg2-binary>=2.9.10
+pillow>=11
+numpy>=1.26
+python-dotenv>=1.0
+requests>=2.32

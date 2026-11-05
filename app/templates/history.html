@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block content %}
+<section class="card wide">
+  <h1>Prediction history</h1>
+  <p class="muted">Most recent {{ rows|length }} requests, read from the database.</p>
+  {% if rows %}
+  <div class="table-wrap">
+  <table class="history">
+    <thead><tr><th>#</th><th>When (UTC)</th><th>File</th><th>Decision</th><th>Confidence</th><th>P(AI)</th><th>Threshold</th><th>Model</th><th>Backend</th><th>Latency</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td>{{ r.id }}</td>
+        <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        <td title="{{ r.image_sha256 }}">{{ r.filename }}</td>
+        <td><span class="pill {{ 'ai' if r.label == 'AI-generated' else 'real' }}">{{ r.label }}</span></td>
+        <td>{{ '%.1f'|format(r.confidence * 100) }}%</td>
+        <td>{{ '%.4f'|format(r.prob_ai) }}</td>
+        <td>{{ r.threshold }}</td>
+        <td>{{ r.model_name }} @ {{ r.model_version }}</td>
+        <td>{{ r.backend }}</td>
+        <td>{{ r.latency_ms }} ms</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <p>No predictions yet. <a href="{{ url_for('main.index') }}">Upload an image</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}
