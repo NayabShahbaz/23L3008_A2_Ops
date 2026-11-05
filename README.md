@@ -1,13 +1,13 @@
 # VisionGuard — 23L3008_A2_Ops
 
-![ci](https://github.com/<YOUR_GITHUB_USER>/23L3008_A2_Ops/actions/workflows/ci.yml/badge.svg)
+![ci](https://github.com/NayabShahbaz/23L3008_A2_Ops/actions/workflows/ci.yml/badge.svg)
 
 VisionGuard is a web service that says whether an uploaded image is **AI-generated** or **real**: a TensorFlow/Keras model, MLflow tracking on DagsHub, a Flask UI, a database log of every request, Docker Compose, and a cloud model API.
 
 | Link | URL |
 |---|---|
-| GitHub | `https://github.com/<user>/23L3008_A2_Ops` |
-| DagsHub | `https://dagshub.com/<user>/23L3008_A2_Ops` |
+| GitHub | `https://github.com/NayabShahbaz/23L3008_A2_Ops` |
+| DagsHub | `https://dagshub.com/NayabShahbaz/23L3008_A2_Ops` |
 | Model API | `https://<your-api-host>/predict` |
 
 ## Layout
