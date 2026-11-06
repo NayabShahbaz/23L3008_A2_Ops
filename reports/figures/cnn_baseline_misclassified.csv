@@ -1,0 +1,11 @@
+path,label,class,prob_ai,pred,conf_err
+data/raw/AiArtData/aiart.png,1,ai,0.3325083,0,0.46461067
+data/raw/AiArtData/realistic-disney-characters-artificial-intelligence-toyboyfan-fb.png,1,ai,0.35485888,0,0.4422601
+data/raw/AiArtData/3eb2e6d3-6ab8-445e-beb2-afdadb30afbd.jpg,1,ai,0.3852369,0,0.41188207
+data/raw/AiArtData/mouse-in-a-maze.jpg,1,ai,0.39142025,0,0.40569872
+data/raw/AiArtData/How-to-Earn-Money-through-AI-Generated-Artwork-A-Simplified-Guide.jpg,1,ai,0.39670852,0,0.40041044
+data/raw/AiArtData/google-dream-starry-night.jpg,1,ai,0.4030602,0,0.39405876
+data/raw/AiArtData/maxresdefault3.jpg,1,ai,0.41666606,0,0.3804529
+data/raw/AiArtData/Biden1400.jpg,1,ai,0.42799073,0,0.36912823
+data/raw/AiArtData/2A8oNV0baUgW9iGIEk1X.jpg,1,ai,0.43199942,0,0.36511955
+data/raw/AiArtData/BX9vGbWoqCKEVwkfGHvu.jpg,1,ai,0.43915722,0,0.35796174

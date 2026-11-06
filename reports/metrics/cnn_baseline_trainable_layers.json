@@ -1,0 +1,11 @@
+{
+  "trainable_layers": [
+    "conv1",
+    "bn1",
+    "conv2",
+    "bn2",
+    "conv3",
+    "bn3",
+    "p_ai"
+  ]
+}

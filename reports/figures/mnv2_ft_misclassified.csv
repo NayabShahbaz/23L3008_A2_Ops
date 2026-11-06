@@ -1,0 +1,11 @@
+path,label,class,prob_ai,pred,conf_err
+data/raw/AiArtData/NeseDevenot_02.jpg,1,ai,0.023698693,0,0.8195425
+data/raw/AiArtData/Midjourney-2.png,1,ai,0.09221294,0,0.7510283
+data/raw/AiArtData/alice.png,1,ai,0.1180144,0,0.7252268
+data/raw/AiArtData/merlin_145496349_2ef618d1-e2db-41ac-bfc0-333987273896-superJumbo.jpg,1,ai,0.13852301,0,0.70471823
+data/raw/AiArtData/hero-image.fill.size_1248x702.v1623363981.png,1,ai,0.17319866,0,0.6700426
+data/raw/AiArtData/nvidia-ai-scribbles-realistic-landscapes.png,1,ai,0.25609994,0,0.5871413
+data/raw/AiArtData/AI_art_1685017093404_1685017098933.jpeg,1,ai,0.2869408,0,0.5563004
+data/raw/AiArtData/335893730_1248848252414001_2214479283759117231_n_1679724354609_1679724368314_1679724368314.jpg,1,ai,0.34540704,0,0.49783418
+data/raw/AiArtData/3e9bc32a-1d77-4f0a-b0df-199c80060385-1024x1024.jpg,1,ai,0.36696005,0,0.47628117
+data/raw/AiArtData/2A8oNV0baUgW9iGIEk1X.jpg,1,ai,0.4057354,0,0.4375058

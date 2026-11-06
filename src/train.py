@@ -149,17 +149,19 @@ def main() -> None:
             lr1 = a.lr or tr["stage1_lr"]
             lr2 = lr1 * (tr["stage2_lr"] / tr["stage1_lr"])
             n_unfreeze = a.unfreeze if a.unfreeze is not None else tr["unfreeze_last_n"]
+            ep1 = a.epochs or tr["stage1_epochs"]          # --epochs N -> N epochs per stage
+            ep2 = a.epochs or tr["stage2_epochs"]
             model, base = build_transfer(size, backbone, tr["head_dropout"])
             if a.tracking == "manual":
                 mlflow.log_params({"backbone": backbone, "stage1_lr": lr1, "stage2_lr": lr2,
-                                   "stage1_epochs": tr["stage1_epochs"], "stage2_epochs": tr["stage2_epochs"],
+                                   "stage1_epochs": ep1, "stage2_epochs": ep2,
                                    "unfreeze_last_n": n_unfreeze, "head_dropout": tr["head_dropout"]})
 
             # Stage 1: frozen backbone, train the head only
             compile_model(model, lr1)
             stage1_trainable = trainable_layers(model)
             cbs = callbacks(ckpt, p) + ([MLflowEpochLogger(mlflow)] if a.tracking == "manual" else [])
-            h1 = model.fit(train_ds, validation_data=val_ds, epochs=tr["stage1_epochs"], callbacks=cbs).history
+            h1 = model.fit(train_ds, validation_data=val_ds, epochs=ep1, callbacks=cbs).history
             plot_curves(h1, FIGS / f"{run_name}_stage1_curves.png", f"{run_name} stage 1")
 
             # Stage 2: unfreeze last block, much smaller LR (recompile is required)
@@ -168,7 +170,7 @@ def main() -> None:
             stage2_trainable = trainable_layers(model)
             off = len(h1["loss"])
             cbs = callbacks(ckpt, p) + ([MLflowEpochLogger(mlflow, offset=off)] if a.tracking == "manual" else [])
-            h2 = model.fit(train_ds, validation_data=val_ds, epochs=tr["stage2_epochs"], callbacks=cbs).history
+            h2 = model.fit(train_ds, validation_data=val_ds, epochs=ep2, callbacks=cbs).history
             plot_curves(h2, FIGS / f"{run_name}_stage2_curves.png", f"{run_name} stage 2")
             hist = merge(h1, h2)
             curves, best_epoch = plot_curves(hist, FIGS / f"{run_name}_curves.png", run_name, stage_split=off)
