@@ -1,0 +1,11 @@
+path,label,class,prob_ai,pred,conf_err
+data/raw/AiArtData/Midjourney-2.png,1,ai,0.20884542,0,0.6270551
+data/raw/AiArtData/NeseDevenot_02.jpg,1,ai,0.24453177,0,0.5913688
+data/raw/AiArtData/merlin_145496349_2ef618d1-e2db-41ac-bfc0-333987273896-superJumbo.jpg,1,ai,0.27260414,0,0.56329644
+data/raw/AiArtData/hero-image.fill.size_1248x702.v1623363981.png,1,ai,0.295865,0,0.54003555
+data/raw/AiArtData/alice.png,1,ai,0.32928985,0,0.5066107
+data/raw/AiArtData/AI_art_1685017093404_1685017098933.jpeg,1,ai,0.38937128,0,0.44652927
+data/raw/AiArtData/nvidia-ai-scribbles-realistic-landscapes.png,1,ai,0.39259803,0,0.4433025
+data/raw/AiArtData/ai-portraits-celebrities-beyonce.jpg,1,ai,0.39381644,0,0.4420841
+data/raw/AiArtData/nathan-shipley-historical-ai-portraits-15.jpg,1,ai,0.3979225,0,0.43797806
+data/raw/AiArtData/3FUI5P53A5JRLCB432NGJMWTMU.jpg,1,ai,0.44539934,0,0.3905012

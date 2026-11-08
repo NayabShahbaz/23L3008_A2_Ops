@@ -7,7 +7,8 @@
   <div class="meter"><div style="width: {{ (p.confidence * 100)|round(1) }}%"></div></div>
   <table class="kv">
     <tr><th>File</th><td>{{ filename }} ({{ size[0] }}×{{ size[1] }})</td></tr>
-    <tr><th>Confidence</th><td>{{ '%.1f'|format(p.confidence * 100) }}%</td></tr>
+    <tr><th>Confidence</th><td>{{ '%.1f'|format(p.confidence * 100) }}%
+      <span class="muted small">(how far the score is past the threshold: 0% = borderline, 100% = certain)</span></td></tr>
     <tr><th>P(AI-generated)</th><td>{{ '%.4f'|format(p.prob_ai) }} (threshold {{ p.threshold }})</td></tr>
     <tr><th>Model</th><td>{{ p.model_name }} @ {{ p.model_version }}</td></tr>
     <tr><th>Latency</th><td>{{ p.latency_ms }} ms</td></tr>

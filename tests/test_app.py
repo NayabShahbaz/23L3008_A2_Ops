@@ -52,7 +52,7 @@ def test_valid_upload_is_logged(client):
     assert r.status_code == 200
     assert b"AI-generated" in r.data
     rows = client.get("/history?format=json").get_json()
-    assert len(rows) == 1 and rows[0]["filename"] == "cat.png" and rows[0]["confidence"] == 0.9
+    assert len(rows) == 1 and rows[0]["filename"] == "cat.png" and rows[0]["confidence"] == 0.8
 
 
 def test_wrong_extension_rejected(client):

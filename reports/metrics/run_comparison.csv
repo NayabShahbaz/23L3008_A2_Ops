@@ -1,0 +1,7 @@
+run,run_id,backbone,stage1_lr,augment,unfreeze_last_n,img_size,stage1_epochs,test_roc_auc,test_f1,test_accuracy,test_precision,test_recall,test_threshold,best_epoch
+cmp_noaug,20340b2c,MobileNetV2,0.001,False,20,224,5,0.8816,0.5932,0.6735,0.9459,0.4321,0.8779,10.0
+cmp_unfreeze40,1b2e1e66,MobileNetV2,0.001,True,40,224,5,0.881,0.531,0.6395,0.9375,0.3704,0.8936,10.0
+cmp_base,6e7dfcf8,MobileNetV2,0.001,True,20,224,5,0.8663,0.4909,0.619,0.931,0.3333,0.8701,9.0
+cmp_effb0,3f78cbb3,EfficientNetB0,0.001,True,20,224,5,0.8591,0.5882,0.6667,0.9211,0.4321,0.7954,10.0
+cmp_lr5e-4,d52f3a14,MobileNetV2,0.0005,True,20,224,5,0.852,0.4815,0.619,0.963,0.321,0.8359,10.0
+cmp_160,f52d0fa2,MobileNetV2,0.001,True,20,160,5,0.8462,0.5254,0.619,0.8378,0.3827,0.8759,10.0

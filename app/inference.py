@@ -22,7 +22,7 @@ TF_NATIVE = {"JPEG", "PNG", "BMP", "GIF"}
 class Prediction:
     label: str            # "AI-generated" | "Real"
     prob_ai: float        # model output P(AI)
-    confidence: float     # probability of the chosen label
+    confidence: float     # how far past the threshold, into the chosen side (0 = on threshold, 1 = certain)
     threshold: float
     model_name: str
     model_version: str
@@ -42,12 +42,25 @@ def to_tf_decodable(image_bytes: bytes) -> bytes:
         return buf.getvalue()
 
 
+def confidence_for(prob_ai: float, threshold: float) -> float:
+    """Normalised margin from the decision threshold.
+
+    With a non-0.5 threshold, "probability of the chosen label" is misleading
+    (p=0.78 with t=0.84 is labelled Real but P(real)=0.22). Instead measure how
+    far the score lies into the chosen side: 0 = exactly on the threshold,
+    1 = at the extreme (p=1 for AI, p=0 for Real).
+    """
+    if prob_ai >= threshold:
+        return (prob_ai - threshold) / (1 - threshold) if threshold < 1 else 1.0
+    return (threshold - prob_ai) / threshold if threshold > 0 else 1.0
+
+
 def make_prediction(prob_ai: float, threshold: float, name: str, version: str, t0: float) -> Prediction:
     is_ai = prob_ai >= threshold
     return Prediction(
         label="AI-generated" if is_ai else "Real",
         prob_ai=round(prob_ai, 4),
-        confidence=round(prob_ai if is_ai else 1 - prob_ai, 4),
+        confidence=round(confidence_for(prob_ai, threshold), 4),
         threshold=threshold, model_name=name, model_version=version,
         latency_ms=round((time.perf_counter() - t0) * 1000, 1),
     )

@@ -1,0 +1,11 @@
+path,label,class,prob_ai,pred,conf_err
+data/raw/AiArtData/NeseDevenot_02.jpg,1,ai,0.095805496,0,0.7820487
+data/raw/AiArtData/Midjourney-2.png,1,ai,0.15446192,0,0.7233923
+data/raw/AiArtData/merlin_145496349_2ef618d1-e2db-41ac-bfc0-333987273896-superJumbo.jpg,1,ai,0.17988731,0,0.69796693
+data/raw/AiArtData/nvidia-ai-scribbles-realistic-landscapes.png,1,ai,0.18333504,0,0.69451916
+data/raw/AiArtData/alice.png,1,ai,0.19571397,0,0.68214023
+data/raw/AiArtData/hero-image.fill.size_1248x702.v1623363981.png,1,ai,0.2183916,0,0.65946263
+data/raw/AiArtData/AI_art_1685017093404_1685017098933.jpeg,1,ai,0.37656426,0,0.50128996
+data/raw/AiArtData/mouse-in-a-maze.jpg,1,ai,0.425977,0,0.45187724
+data/raw/AiArtData/il_570xN.4503972325_g40z.jpg,1,ai,0.48971093,0,0.3881433
+data/raw/AiArtData/ai-portraits-celebrities-beyonce.jpg,1,ai,0.49929923,0,0.378555

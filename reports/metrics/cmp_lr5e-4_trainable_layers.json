@@ -1,0 +1,15 @@
+{
+  "stage1_trainable": [
+    "p_ai"
+  ],
+  "stage2_trainable": [
+    "block_15_expand",
+    "block_15_depthwise",
+    "block_15_project",
+    "block_16_expand",
+    "block_16_depthwise",
+    "block_16_project",
+    "Conv_1",
+    "p_ai"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "visionguard-test",
+      "runtimeExecutable": "C:\\Users\\Hp\\Desktop\\23L3008_A2_ops\\.venv\\Scripts\\python.exe",
+      "runtimeArgs": ["-m", "app"],
+      "port": 5055,
+      "env": {
+        "PORT": "5055",
+        "TF_CPP_MIN_LOG_LEVEL": "2",
+        "DATABASE_URL": "sqlite:///C:/Users/Hp/AppData/Local/Temp/claude/4cfcbd5de36cf84f/3f0cbdfc-178d-4b80-a23d-c79aeb146185/scratchpad/apptest.db"
+      }
+    }
+  ]
+}

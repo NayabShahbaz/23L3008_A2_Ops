@@ -1,0 +1,11 @@
+path,label,class,prob_ai,pred,conf_err
+data/raw/AiArtData/NeseDevenot_02.jpg,1,ai,0.20142834,0,0.6744266
+data/raw/AiArtData/nvidia-ai-scribbles-realistic-landscapes.png,1,ai,0.31642163,0,0.55943334
+data/raw/AiArtData/bDSF6saJUuPLsEu9i3ud--1--gvs7i.jpg,1,ai,0.33726075,0,0.53859425
+data/raw/AiArtData/merlin_145496349_2ef618d1-e2db-41ac-bfc0-333987273896-superJumbo.jpg,1,ai,0.33825952,0,0.53759545
+data/raw/AiArtData/alice.png,1,ai,0.3571099,0,0.51874506
+data/raw/AiArtData/_a_peaceful_countryside_Beaches_with_a__2edf54e5-d4e4-4507-abde-4f81b9754b54.png,1,ai,0.38975888,0,0.48609608
+data/raw/AiArtData/maxresdefault3.jpg,1,ai,0.39536306,0,0.4804919
+data/raw/AiArtData/hero-image.fill.size_1248x702.v1623363981.png,1,ai,0.45143136,0,0.4244236
+data/raw/AiArtData/ai-future-creativity.jpg,1,ai,0.48748878,0,0.3883662
+data/raw/AiArtData/mouse-in-a-maze.jpg,1,ai,0.48955616,0,0.3862988

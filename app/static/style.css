@@ -15,6 +15,7 @@ nav a:hover { opacity: 1; text-decoration: underline; }
 .container:has(.wide) { max-width: 1150px; }
 h1 { margin-top: 0; font-size: 1.5rem; }
 .muted { color: var(--muted); }
+.small { font-size: .82rem; }
 .upload { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
 .upload input[type=file] { flex: 1; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; }
 button, .button { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 10px 18px; font-size: 1rem; cursor: pointer; text-decoration: none; display: inline-block; }
