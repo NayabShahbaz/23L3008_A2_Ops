@@ -1,0 +1,17 @@
+# Task 6.4 - the deliberately NAIVE "before" image, kept only to measure the size difference.
+# Do NOT deploy this. Problems on purpose:
+#   - full python:3.12 base (Debian with compilers, ~1 GB) instead of -slim
+#   - full "tensorflow" package instead of tensorflow-cpu
+#   - pip download cache kept inside the layer
+#   - COPY . . before installing deps (any code edit re-runs pip) and copies the dataset,
+#     reports, labs, notebooks ... because there is no proper .dockerignore
+#   - runs as root, no HEALTHCHECK
+#   docker build -f Dockerfile.before -t 23l3008-a2-ops-web:before .
+FROM python:3.12
+
+WORKDIR /app
+COPY . .
+RUN pip install tensorflow && pip install -r requirements-app.txt
+
+EXPOSE 5000
+CMD ["gunicorn", "app.wsgi:app", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "4", "--timeout", "120"]

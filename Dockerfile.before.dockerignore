@@ -1,0 +1,10 @@
+# Used only by Dockerfile.before (BuildKit picks <Dockerfile>.dockerignore over .dockerignore).
+# Naive on purpose: only the virtualenv, git history and caches are skipped, so the dataset,
+# reports, labs etc. end up in the image. Secrets are still excluded - never bake .env in.
+.venv
+.git
+.dvc/cache
+tuner_runs
+mlruns
+.env
+*.env
