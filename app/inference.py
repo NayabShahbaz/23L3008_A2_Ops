@@ -92,29 +92,105 @@ class LocalPredictor:
         return make_prediction(prob, self.threshold, self.name, self.version, t0)
 
 
-class RemotePredictor:
-    backend = "remote"
+class LitePredictor:
+    """Same model converted to TFLite (src/export_tflite.py) - no TensorFlow needed,
+    ~150 MB RAM instead of ~1 GB, so the API fits a 512 MB free host (Task 7)."""
+    backend = "tflite"
 
-    def __init__(self, url: str, api_key: str, timeout: float = 30):
-        import requests
+    def __init__(self, model_path: str, img_size: int, threshold: float, name: str, version: str):
+        import threading
 
-        self.session = requests.Session()
-        self.session.headers["X-API-Key"] = api_key
-        self.url, self.timeout = url, timeout
+        try:
+            from ai_edge_litert.interpreter import Interpreter  # small runtime (Linux/macOS)
+        except ImportError:
+            import tensorflow as tf  # local fallback (e.g. Windows, no ai-edge-litert wheel)
+
+            Interpreter = tf.lite.Interpreter
+
+        from app.preprocess_np import decode_and_resize
+
+        self._decode = decode_and_resize
+        self.interp = Interpreter(model_path=model_path)             # once, not per request
+        self.interp.allocate_tensors()
+        self._in = self.interp.get_input_details()[0]["index"]
+        self._out = self.interp.get_output_details()[0]["index"]
+        self._lock = threading.Lock()                                # one interpreter, many threads
+        self.img_size, self.threshold, self.name, self.version = img_size, threshold, name, version
+        self._run(self._decode(LocalPredictor._dummy_png(), img_size))  # warm-up
+
+    def _run(self, x) -> float:
+        with self._lock:
+            self.interp.set_tensor(self._in, x[None].astype("float32"))
+            self.interp.invoke()
+            return float(self.interp.get_tensor(self._out)[0, 0])
 
     def predict(self, image_bytes: bytes) -> Prediction:
         t0 = time.perf_counter()
-        r = self.session.post(self.url, files={"image": ("upload", image_bytes)}, timeout=self.timeout)
-        r.raise_for_status()
+        prob = self._run(self._decode(image_bytes, self.img_size))
+        return make_prediction(prob, self.threshold, self.name, self.version, t0)
+
+
+class ModelServiceError(Exception):
+    """The remote model API failed; message is safe to show to the user."""
+
+
+class RemotePredictor:
+    """Task 8 - the Flask app sends the image to the cloud model API (Task 7)."""
+    backend = "remote"
+
+    def __init__(self, url: str, api_key: str, timeout: float = 90):
+        import requests
+
+        if not url or not api_key:
+            raise ValueError("INFERENCE_BACKEND=remote needs MODEL_API_URL and MODEL_API_KEY")
+        self._requests = requests
+        self.session = requests.Session()                      # keeps the HTTPS connection alive
+        self.session.headers.update({"X-API-Key": api_key, "User-Agent": "visionguard-web/1.0"})
+        self.url, self.timeout = url, timeout
+        self.health_url = url.rsplit("/predict", 1)[0] + "/health"
+
+    def predict(self, image_bytes: bytes) -> Prediction:
+        rq = self._requests
+        t0 = time.perf_counter()
+        try:
+            # (connect, read) timeouts: a sleeping free-tier API can take ~1 min to wake up
+            r = self.session.post(self.url, files={"image": ("upload", image_bytes)},
+                                  timeout=(10, self.timeout))
+        except rq.Timeout as e:
+            raise ModelServiceError(f"The model API did not answer within {self.timeout:.0f}s "
+                                    "(it may be waking up) - please try again.") from e
+        except rq.ConnectionError as e:
+            raise ModelServiceError("Cannot reach the model API - check MODEL_API_URL / internet.") from e
+        if r.status_code == 401:
+            raise ModelServiceError("The model API rejected our key (401) - check MODEL_API_KEY.")
+        if r.status_code in (413, 422):
+            raise ModelServiceError(f"The model API refused this image ({r.status_code}).")
+        if r.status_code != 200:
+            raise ModelServiceError(f"The model API returned HTTP {r.status_code} - try again later.")
         d = r.json()
+        # label/confidence are recomputed here from the API's own threshold -> same logic as local
         return make_prediction(float(d["prob_ai"]), float(d["threshold"]), d["model_name"],
                                d["model_version"], t0)
 
+    def health(self, timeout: float = 5) -> str:
+        try:
+            r = self.session.get(self.health_url, timeout=timeout)
+            return "ok" if r.ok else f"HTTP {r.status_code}"
+        except self._requests.RequestException as e:
+            return f"unreachable ({type(e).__name__}) - may be waking up"
 
-def build_predictor(cfg) -> LocalPredictor | RemotePredictor:
+
+def load_model_predictor(model_path: str, img_size: int, threshold: float, name: str, version: str):
+    """.tflite -> LitePredictor (no TensorFlow), anything else -> Keras LocalPredictor."""
+    cls = LitePredictor if model_path.endswith(".tflite") else LocalPredictor
+    return cls(model_path, img_size, threshold, name, version)
+
+
+def build_predictor(cfg) -> LocalPredictor | LitePredictor | RemotePredictor:
     if cfg.INFERENCE_BACKEND == "remote":
         return RemotePredictor(cfg.MODEL_API_URL, cfg.MODEL_API_KEY, cfg.MODEL_API_TIMEOUT)
-    return LocalPredictor(cfg.MODEL_PATH, cfg.IMG_SIZE, cfg.DECISION_THRESHOLD, cfg.MODEL_NAME, cfg.MODEL_VERSION)
+    return load_model_predictor(cfg.MODEL_PATH, cfg.IMG_SIZE, cfg.DECISION_THRESHOLD, cfg.MODEL_NAME,
+                                cfg.MODEL_VERSION)
 
 
 if __name__ == "__main__":

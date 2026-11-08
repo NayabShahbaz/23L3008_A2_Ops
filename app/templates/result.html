@@ -11,6 +11,7 @@
       <span class="muted small">(how far the score is past the threshold: 0% = borderline, 100% = certain)</span></td></tr>
     <tr><th>P(AI-generated)</th><td>{{ '%.4f'|format(p.prob_ai) }} (threshold {{ p.threshold }})</td></tr>
     <tr><th>Model</th><td>{{ p.model_name }} @ {{ p.model_version }}</td></tr>
+    <tr><th>Served by</th><td>{{ "cloud model API (remote)" if backend == "remote" else backend ~ " model in this app" }}</td></tr>
     <tr><th>Latency</th><td>{{ p.latency_ms }} ms</td></tr>
     <tr><th>Record id</th><td>#{{ row_id }}</td></tr>
   </table>

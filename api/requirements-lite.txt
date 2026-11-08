@@ -1,0 +1,3 @@
+# Extra runtime deps of the TFLite API image (api/Dockerfile.lite) - no TensorFlow.
+ai-edge-litert>=1.2      # TFLite interpreter (Linux/macOS wheels)
+simplejpeg>=1.7          # JPEG decode bit-identical to tf.io.decode_jpeg (fast DCT)

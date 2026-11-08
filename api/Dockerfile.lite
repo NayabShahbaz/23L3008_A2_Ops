@@ -1,0 +1,27 @@
+# Task 7 - SMALL model API image for free 512 MB hosts (Render). Same API code, but
+# the champion model is served as TFLite (src/export_tflite.py) with the tiny
+# ai-edge-litert runtime instead of TensorFlow: ~1/5 of the image, ~150 MB RAM.
+# Predictions match the Keras model on the whole test split (reports/metrics/tflite_check.json).
+#   python -m src.export_tflite
+#   docker build -f api/Dockerfile.lite -t 23l3008-a2-ops-api:lite .
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PORT=8000 MODEL_PATH=models/champion.tflite
+
+WORKDIR /srv
+COPY requirements-app.txt api/requirements-lite.txt ./
+RUN pip install -r requirements-lite.txt -r requirements-app.txt
+
+RUN useradd --create-home --uid 10001 appuser
+COPY app/ app/
+COPY api/ api/
+COPY models/champion.tflite models/champion.tflite
+RUN chown -R appuser:appuser /srv
+USER appuser
+
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD python -c "import os,urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ.get(\"PORT\",\"8000\")}/health', timeout=4)"
+# 1 worker so the model is loaded once; threads give concurrency.
+CMD ["sh", "-c", "gunicorn api.main:api --bind 0.0.0.0:${PORT} --workers 1 --threads 4 --timeout 120 --access-logfile -"]

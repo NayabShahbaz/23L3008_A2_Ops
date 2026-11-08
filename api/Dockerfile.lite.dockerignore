@@ -1,0 +1,9 @@
+# Used automatically (BuildKit) for api/Dockerfile.lite: only what the lite API needs.
+*
+!requirements-app.txt
+!api/
+!app/
+!models/champion.tflite
+**/__pycache__
+app/templates
+app/static

@@ -1,0 +1,8 @@
+{
+  "images": 10,
+  "local_median_ms": 232.1,
+  "remote_median_ms": 631.1,
+  "remote_first_call_ms": 2492.4,
+  "same_label": "10/10",
+  "api_url": "https://api-23l3008-a2-ops.onrender.com/predict"
+}

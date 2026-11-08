@@ -14,6 +14,8 @@ from PIL import Image, UnidentifiedImageError
 from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 
+from app.inference import ModelServiceError
+
 bp = Blueprint("main", __name__)
 
 
@@ -58,6 +60,9 @@ def predict():
         raise UploadError("The model is not loaded. Check /health and the server logs.", 503)
     try:
         pred = predictor.predict(data)
+    except ModelServiceError as e:                    # remote API problem: clear message, 502
+        current_app.logger.error("model API failed: %s", e)
+        raise UploadError(str(e), 502)
     except Exception as e:  # noqa: BLE001
         current_app.logger.exception("prediction failed")
         raise UploadError(f"Model service error: {type(e).__name__}", 502)
@@ -68,10 +73,12 @@ def predict():
         model_name=pred.model_name, model_version=pred.model_version, backend=predictor.backend,
         latency_ms=pred.latency_ms, client_ip=request.headers.get("X-Forwarded-For", request.remote_addr),
     )
-    current_app.logger.info("prediction id=%s file=%s label=%s conf=%.3f", row_id, name, pred.label, pred.confidence)
+    current_app.logger.info("prediction id=%s file=%s label=%s conf=%.3f backend=%s latency=%sms",
+                            row_id, name, pred.label, pred.confidence, predictor.backend, pred.latency_ms)
     if request.args.get("format") == "json" or request.accept_mimetypes.best == "application/json":
         return jsonify(id=row_id, filename=name, **pred.as_dict())
-    return render_template("result.html", p=pred, filename=name, row_id=row_id, size=(w, h))
+    return render_template("result.html", p=pred, filename=name, row_id=row_id, size=(w, h),
+                           backend=predictor.backend)
 
 
 @bp.get("/history")
@@ -97,6 +104,8 @@ def health():
         "threshold": cfg["DECISION_THRESHOLD"], "database": "ok" if db_ok else "unreachable",
         "debug": cfg["DEBUG"],
     }
+    if hasattr(predictor, "health"):                  # remote backend: is the cloud API up?
+        body["model_api"] = predictor.health()       # informative only, does not fail /health
     return jsonify(body), (200 if body["status"] == "ok" else 503)
 
 

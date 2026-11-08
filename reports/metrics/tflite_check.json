@@ -1,0 +1,12 @@
+{
+  "images": 147,
+  "keras_mb": 19.2,
+  "tflite_mb": 8.9,
+  "max_pixel_diff_numpy_vs_tf": 0.0431,
+  "max_prob_diff": 1.0371208190917969e-05,
+  "mean_prob_diff": 1.7611499951810253e-06,
+  "label_agreement_at_threshold": 1.0,
+  "threshold": 0.8432,
+  "keras_ms_per_image": 153.7,
+  "tflite_ms_per_image": 9.7
+}

@@ -1,0 +1,45 @@
+{
+  "info": {
+    "name": "23L3008_A2_Ops VisionGuard API",
+    "description": "Task 7 evidence. Set the collection variable api_key (Variables tab) before sending. Never commit the real key.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://api-23l3008-a2-ops.onrender.com" },
+    { "key": "api_key", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1 - health (Fig 7.3)",
+      "request": { "method": "GET", "url": "{{base_url}}/health" }
+    },
+    {
+      "name": "2 - predict WITH key (Fig 7.4)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "X-API-Key", "value": "{{api_key}}" } ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "image", "type": "file", "src": "C:/Users/Hp/Desktop/23L3008_A2_ops/data/raw/AiArtData/images89.jpg" }
+          ]
+        },
+        "url": "{{base_url}}/predict"
+      }
+    },
+    {
+      "name": "3 - predict WITHOUT key (Fig 7.5)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "image", "type": "file", "src": "C:/Users/Hp/Desktop/23L3008_A2_ops/data/raw/AiArtData/images89.jpg" }
+          ]
+        },
+        "url": "{{base_url}}/predict"
+      }
+    }
+  ]
+}

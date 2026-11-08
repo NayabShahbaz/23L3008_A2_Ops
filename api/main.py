@@ -36,17 +36,29 @@ api.config["MAX_CONTENT_LENGTH"] = int(MAX_MB * 1024 * 1024)
 
 predictor = None
 try:
-    from app.inference import LocalPredictor
+    from app.inference import load_model_predictor
 
-    predictor = LocalPredictor(MODEL_PATH, IMG_SIZE, THRESHOLD, MODEL_NAME, MODEL_VERSION)  # once
-    log.info("model loaded from %s", MODEL_PATH)
+    predictor = load_model_predictor(MODEL_PATH, IMG_SIZE, THRESHOLD, MODEL_NAME, MODEL_VERSION)  # once
+    log.info("model loaded from %s (%s backend)", MODEL_PATH, predictor.backend)
 except Exception as e:  # noqa: BLE001
     log.error("MODEL NOT LOADED: %s", e)
+
+
+def client_ip() -> str:
+    # behind a cloud proxy the real caller is the first X-Forwarded-For entry
+    return request.headers.get("X-Forwarded-For", request.remote_addr or "?").split(",")[0].strip()
 
 
 def authorised() -> bool:
     supplied = request.headers.get("X-API-Key", "")
     return bool(API_KEY) and hmac.compare_digest(supplied, API_KEY)
+
+
+@api.get("/")
+def index():
+    return jsonify(service="23L3008_A2_Ops VisionGuard model API",
+                   endpoints={"GET /health": "no auth",
+                              "POST /predict": "header X-API-Key + multipart field 'image'"})
 
 
 @api.get("/health")
@@ -59,6 +71,7 @@ def health():
 @api.post("/predict")
 def predict():
     if not authorised():
+        log.warning("401 rejected /predict from %s (missing or wrong key)", client_ip())
         return jsonify(error="unauthorised", message="missing or wrong X-API-Key"), 401
     if predictor is None:
         return jsonify(error="model_not_loaded"), 503
@@ -72,7 +85,8 @@ def predict():
     except (UnidentifiedImageError, OSError, SyntaxError):
         return jsonify(error="undecodable_image"), 422
     pred = predictor.predict(data)
-    log.info("predict label=%s prob_ai=%.4f latency=%sms", pred.label, pred.prob_ai, pred.latency_ms)
+    log.info("200 predict from %s label=%s prob_ai=%.4f latency=%sms",
+             client_ip(), pred.label, pred.prob_ai, pred.latency_ms)
     return jsonify(pred.as_dict())
 
 

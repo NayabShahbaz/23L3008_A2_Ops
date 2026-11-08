@@ -25,6 +25,6 @@ class Config:
     DECISION_THRESHOLD = float(os.getenv("DECISION_THRESHOLD", "0.5"))
     MODEL_API_URL = os.getenv("MODEL_API_URL", "")
     MODEL_API_KEY = os.getenv("MODEL_API_KEY", "")
-    MODEL_API_TIMEOUT = float(os.getenv("MODEL_API_TIMEOUT", "30"))
+    MODEL_API_TIMEOUT = float(os.getenv("MODEL_API_TIMEOUT", "90"))  # free hosts wake slowly
 
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///visionguard.db")

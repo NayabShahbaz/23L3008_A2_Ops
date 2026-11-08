@@ -70,3 +70,50 @@ def test_too_large_rejected(client):
 def test_filename_sanitized(client):
     upload(client, png_bytes(), "../../etc/passwd.png")
     assert client.get("/history?format=json").get_json()[0]["filename"] == "etc_passwd.png"
+
+
+# ---------- Task 8: remote backend (the cloud API is faked, no network) ----------
+class FakeResponse:
+    def __init__(self, status, body=None):
+        self.status_code, self._body, self.ok = status, body or {}, status == 200
+
+    def json(self):
+        return self._body
+
+
+def remote_with(response=None, exc=None):
+    from app.inference import RemotePredictor
+
+    rp = RemotePredictor("https://api.example/predict", "k")
+
+    def post(*args, **kwargs):
+        if exc:
+            raise exc
+        return response
+
+    rp.session.post = post
+    return rp
+
+
+def test_remote_success_recomputes_label():
+    body = {"prob_ai": 0.9, "threshold": 0.8, "model_name": "visionguard", "model_version": "champion"}
+    p = remote_with(FakeResponse(200, body)).predict(b"img")
+    assert p.label == "AI-generated" and p.confidence == 0.5 and p.threshold == 0.8
+
+
+@pytest.mark.parametrize("status", [401, 500])
+def test_remote_http_errors_become_clear_messages(status):
+    from app.inference import ModelServiceError
+
+    with pytest.raises(ModelServiceError, match=str(status)):
+        remote_with(FakeResponse(status)).predict(b"img")
+
+
+def test_remote_timeout_shows_friendly_502(tmp_path):
+    import requests
+
+    db = Database(f"sqlite:///{tmp_path / 'r.db'}")
+    app = create_app(Config, predictor=remote_with(exc=requests.Timeout()), database=db)
+    r = upload(app.test_client(), png_bytes(), "cat.png")
+    assert r.status_code == 502 and b"waking up" in r.data
+    assert db.recent() == []                     # failed calls are not logged as predictions

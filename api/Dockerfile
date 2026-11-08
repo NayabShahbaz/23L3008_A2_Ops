@@ -21,4 +21,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD python -c "import os,urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ.get(\"PORT\",\"8000\")}/health', timeout=4)"
 # 1 worker so the TF model is loaded once; threads give concurrency.
-CMD ["sh", "-c", "gunicorn api.main:api --bind 0.0.0.0:${PORT} --workers 1 --threads 4 --timeout 120"]
+CMD ["sh", "-c", "gunicorn api.main:api --bind 0.0.0.0:${PORT} --workers 1 --threads 4 --timeout 120 --access-logfile -"]

@@ -8,7 +8,7 @@ VisionGuard is a web service that says whether an uploaded image is **AI-generat
 |---|---|
 | GitHub | `https://github.com/NayabShahbaz/23L3008_A2_Ops` |
 | DagsHub | `https://dagshub.com/NayabShahbaz/23L3008_A2_Ops` |
-| Model API | `https://<your-api-host>/predict` |
+| Model API | `https://api-23l3008-a2-ops.onrender.com` (`/health`, `/predict`) - Render free tier, sleeps when idle (~1 min first request) |
 
 ## Layout
 
@@ -28,7 +28,8 @@ VisionGuard is a web service that says whether an uploaded image is **AI-generat
 │   ├── register.py          # 3.6 registry versions, alias, download champion
 │   ├── predict_from_registry.py  # 3.6 load by alias, classify one image
 │   ├── compare_runs.py      # 3.5 comparison table/plot of MLflow runs
-│   └── show_db.py           # 5   query the predictions table directly
+│   ├── show_db.py           # 5   query the predictions table directly
+│   └── export_tflite.py     # 7   Keras -> TFLite + check predictions still match
 ├── app/                     # Task 4/5 Flask app (upload, result, history, health) + DB
 ├── api/                     # Task 7 cloud model API (+ its own Dockerfile)
 ├── tests/                   # pytest for the app (no TensorFlow needed)
@@ -55,7 +56,14 @@ docker compose up -d --build                            # full stack
 
 ## Model API (Task 7)
 
-A small Flask service ([api/main.py](api/main.py)) that serves the champion model over HTTP. Its image ([api/Dockerfile](api/Dockerfile)) has the model **built in**, so a cloud host needs nothing else.
+A small Flask service ([api/main.py](api/main.py)) that serves the champion model over HTTP. The model is **built into** the image, so a cloud host needs nothing else. Two images, same API code:
+
+| Image | Model / runtime | Size | RAM | Use |
+|---|---|---|---|---|
+| [api/Dockerfile](api/Dockerfile) | `champion.keras` + tensorflow-cpu | 2.2 GB | ~1 GB | hosts with ≥ 2 GB RAM |
+| [api/Dockerfile.lite](api/Dockerfile.lite) | `champion.tflite` + ai-edge-litert | 0.5 GB | ~90 MB | **deployed** (free 512 MB tier) |
+
+`python -m src.export_tflite` converts the model and checks it on the test split: identical labels on all 147 images, max P(AI) difference 1e-5 ([reports/metrics/tflite_check.json](reports/metrics/tflite_check.json)). JPEGs are decoded with `simplejpeg(fastdct=True)` so the pixels are bit-identical to `tf.io.decode_jpeg`.
 
 | Method | Path | Auth | Returns |
 |---|---|---|---|
@@ -65,7 +73,7 @@ A small Flask service ([api/main.py](api/main.py)) that serves the champion mode
 `/predict` takes a multipart form field `image` (max 5 MB):
 
 ```bash
-curl -H "X-API-Key: <key>" -F "image=@data/raw/AiArtData/images89.jpg" https://<your-api-host>/predict
+curl -H "X-API-Key: <key>" -F "image=@data/raw/AiArtData/images89.jpg" https://api-23l3008-a2-ops.onrender.com/predict
 ```
 
 ```json
@@ -89,10 +97,11 @@ Run it locally:
 ```bash
 python -m api.main                                        # http://127.0.0.1:8000
 docker build -f api/Dockerfile -t 23l3008-a2-ops-api .    # or as a container
+docker build -f api/Dockerfile.lite -t 23l3008-a2-ops-api:lite .   # small TFLite image
 docker compose --profile api up -d api                    # or next to the web app
 ```
 
-**Flask → API (Task 8):** set `INFERENCE_BACKEND=remote`, `MODEL_API_URL=https://<your-api-host>/predict` and `MODEL_API_KEY=<key>` in `.env`; the web app then sends uploads to the API instead of loading the model itself, and still logs every prediction to its database.
+**Flask → API (Task 8):** set `INFERENCE_BACKEND=remote`, `MODEL_API_URL=https://api-23l3008-a2-ops.onrender.com/predict` and `MODEL_API_KEY=<key>` in `.env`; the web app then sends uploads to the API instead of loading the model itself, and still logs every prediction to its database.
 
 ## Notes
 
